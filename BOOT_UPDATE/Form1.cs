@@ -605,6 +605,11 @@ namespace BOOT_UPDATE
         {
             About.ShowDialog();
         }
+
+        private void cmPort_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
 
