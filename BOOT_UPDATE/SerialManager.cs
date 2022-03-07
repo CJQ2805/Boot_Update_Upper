@@ -16,7 +16,6 @@ namespace CJQ_2805
 		private const int Time_Out = 2000; //ms
 
 		private SerialPort m_SerialPort;
-		private TimeSpan m_timeout = new TimeSpan(0,0,0,0,Time_Out);
 
 
         byte[] my_CommRevArr = new byte[255];

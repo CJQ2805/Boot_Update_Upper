@@ -170,8 +170,8 @@ namespace CJQ_2805
             send_data[1] = 0xFE;
             send_data[lenAdd++] = cmd;
             send_data[lenAdd++] = 0;
-            crc16 = crc16_check(send_data, 4);
-            setCrc();
+            crc16 = CRC_16(send_data, 4);
+            setUpCrc();
             send_data[lenAdd++] = 0xBB;
         }
         public void TxCmd_1(byte cmd)
@@ -182,8 +182,8 @@ namespace CJQ_2805
             send_data[lenAdd++] = cmd;
             send_data[lenAdd++] = 0x01;
             send_data[lenAdd++] = 0x01;
-            crc16 = crc16_check(send_data,5);
-            setCrc();
+            crc16 = CRC_16(send_data,5);
+            setUpCrc();
             send_data[lenAdd++] = 0xBB;
         }
 

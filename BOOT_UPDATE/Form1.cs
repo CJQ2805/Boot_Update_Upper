@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
+
 namespace BOOT_UPDATE
 {
     public partial class CJQ2805 : Form
@@ -20,20 +21,15 @@ namespace BOOT_UPDATE
         CJQ_2805.SerialManager loaderserial;
         CJQ_2805.HexParse      loaderhex;
         CJQ_2805.CommPack      loaderframe;
-
+        About About = new About();
         //文件创建标志
         bool readFileFlag = false; 
-        int SaveCnt = 0;
-        bool CreatFlag = false;
-        bool CreatThread = false;
-        string SaveTime;
-        bool userPassWrod = false;
-        bool testUnlock = true;
 
 
         public CJQ2805()
         {
             InitializeComponent();
+            //System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
         }
 
         private void CJQ2805_Load(object sender, EventArgs e)
@@ -134,60 +130,86 @@ namespace BOOT_UPDATE
                 }
 
                 Application.DoEvents();
-                Thread.Sleep(10);
+                System.Threading.Thread.Sleep(10);
+            }
+        
+        }
+
+        public void delay_time(byte time)
+        {
+            byte btout_time_cnt = 0;
+
+            while (btout_time_cnt < time)
+            {
+                btout_time_cnt++;
+                System.Threading.Thread.Sleep(25);
+                if (loaderserial.get_rc_cnt() > 7)
+                {
+                    Debug.WriteLine("up_stat wait" + btout_time_cnt.ToString());
+                    break;
+                }
+
+            }
+
+            if (btout_time_cnt >= 10)
+            {
+                Debug.WriteLine("up_stat wait " + "超时");    
             }
         
         }
 
         private void UpDate_Btn_Click(object sender, EventArgs e)
         {
-            Updata_process();
+            UpDate_Btn.Enabled = false;
+            Thread R1 = new Thread(Updata_process);
+            R1.IsBackground = true;
+            R1.Start();
         }
 
         public void Updata_process()
         {
             byte i = 0;
+            //System.Threading.Thread.Sleep(150);
             //for (byte i = 0; i < 3; i++) 
             //{
             //    loaderserial.clear_rev();
             //    loaderserial.Write(loaderframe);
             //}
-            UpDate_Btn.Enabled = false;
+ 
 
-            for (i = 0; i < 5; i++)
+            for (i = 0; i <= 5; i++)
             {
-                Delay_Ms(1000);
                 loaderserial.clear_rev();
                 loaderframe.TxCmd(BOOT_UPDATE.CMD.UPDATE_CMD_APP_INTO_BOOT);
                 loaderserial.Write(loaderframe);//上一句只是组包，没有发送
                 Display_label("update start!",Color.DarkGray, Color.Green);
-
+                delay_time(20);
                 if (loaderserial.get_rc_cnt() > 7)
                 {
                     if (loaderframe.IsRespondOk(loaderserial, BOOT_UPDATE.CMD.UPDATE_CMD_APP_INTO_BOOT) == 1)
                     {
                         Display_label("app into boot ok", Color.DarkGray, Color.Green);
 
-                    }                
+                    }
                 }
+
             }
             //进入IAP程序成功
             for (i = 0; i < 3; i++)
             {
-                Delay_Ms(1000);
                 loaderserial.clear_rev();
-                Display_label("compel ready", Color.DarkGray, Color.Green);
+                Display_label("准备流程", Color.DarkGray, Color.Green);
                 loaderserial.Writebyte(BOOT_UPDATE.CMD.UPDATE_CMD_COMPEL_READY);
-
+                delay_time(25);
                 if (loaderserial.get_rc_cnt() > 7)
                 {
                     if (loaderframe.IsCommandRespondOk(loaderserial, BOOT_UPDATE.CMD.UPDATE_CMD_COMPEL_READY_OK) == 1)
                     {
-                        Display_label("compel ready ok", Color.DarkGray, Color.Green);
+                        Display_label("准备就绪", Color.DarkGray, Color.Green);
                     }
                     else 
                     {
-                        Display_label("compel ready try", Color.DarkGray, Color.Yellow);
+                        Display_label("准备流程重连", Color.DarkGray, Color.Yellow);
 
                     }
                 }
@@ -196,11 +218,11 @@ namespace BOOT_UPDATE
             //准备进行IAP处理
             for (i = 0; i < 3; i++)
             {
-                Delay_Ms(1000);
+
                 loaderserial.clear_rev();
                 Display_label("updata ready", Color.DarkGray, Color.Green);
                 loaderserial.Writebyte(BOOT_UPDATE.CMD.UPDATE_CMD_UPDATA_READY);
- 
+                delay_time(25);
                 if (loaderserial.get_rc_cnt() > 7)
                 {
                     if (loaderframe.IsCommandRespondOk(loaderserial, BOOT_UPDATE.CMD.UPDATE_CMD_UPDATA_READY_OK) == 1)
@@ -219,23 +241,22 @@ namespace BOOT_UPDATE
             //擦除下位机flash
             for (i = 0; i < 3; i++)
             {
-                Delay_Ms(1000);
                 loaderserial.clear_rev();
-                Display_label("erase flash",Color.DarkGray,Color.Green);
+                Display_label("擦除内存流程",Color.DarkGray,Color.Green);
                 loaderframe.TxCmd(BOOT_UPDATE.CMD.UPDATE_CMD_ERASE);
                 loaderserial.Write(loaderframe);        //上一句只是组包，没有发送
- 
+                delay_time(10);
 
                 if (loaderserial.get_rc_cnt() > 7)
                 {
                     if (loaderframe.IsCommandRespondOk(loaderserial, BOOT_UPDATE.CMD.UPDATE_CMD_ERASE_OK) == 1)
                     {
-                        Display_label("erase flash ok", Color.DarkGray, Color.Green);
+                        Display_label("擦除成功", Color.DarkGray, Color.Green);
                         break;
                     }
                     else 
                     {
-                        Display_label("erase flash try",Color.DarkGray, Color.Green);
+                        Display_label("擦除重连",Color.DarkGray, Color.Green);
                     }
                 }
 
@@ -246,58 +267,77 @@ namespace BOOT_UPDATE
 
             for (i = 0; i < 3; i++)
             {
-                Delay_Ms(600);
                 loaderserial.clear_rev();
-                Display_label("compel ready", Color.DarkGray, Color.Green);
+                Display_label("准备流程", Color.DarkGray, Color.Green);
                 loaderserial.Writebyte(BOOT_UPDATE.CMD.UPDATE_CMD_COMPEL_READY);
+                delay_time(25);
                 if (loaderserial.get_rc_cnt() > 7)
                 {
                     if (loaderframe.IsCommandRespondOk(loaderserial, BOOT_UPDATE.CMD.UPDATE_CMD_COMPEL_READY_OK) == 1)
                     {
-                        Display_label("compel ready ok", Color.DarkGray, Color.Green);
+                        Display_label("准备就绪 OK", Color.DarkGray, Color.Green);
                         break;
                     }
-                    else 
+                    else
                     {
-                        Display_label("compel ready try",Color.DarkGray,Color.Yellow);
+                        Display_label("准备 Try", Color.DarkGray, Color.Green);
                     }
+                }
+            }
+
+
+            for (i = 0; i < 3; i++)
+            {
+                loaderserial.clear_rev();
+                Display_label("升级就绪",Color.DarkGray,Color.Green);
+                loaderserial.Writebyte(BOOT_UPDATE.CMD.UPDATE_CMD_UPDATA_READY);
+                delay_time(25);
+                if (loaderserial.get_rc_cnt() > 7)
+                {
+                    if (loaderframe.IsCommandRespondOk(loaderserial, BOOT_UPDATE.CMD.UPDATE_CMD_UPDATA_READY_OK) == 1)
+                    {
+                        Display_label("升级就绪 OK", Color.DarkGray, Color.Green);
+                        break;
+                    }
+                    else {
+
+                        Display_label("升级重连"+i.ToString(),Color.DarkGray,Color.Green);
+                    }
+
                 }
             }
 
             for (i = 0; i < 3; i++)
             {
-                Delay_Ms(600);
                 loaderserial.clear_rev();
-                Display_label("updata ready",Color.DarkGray,Color.Green);
-                loaderserial.Writebyte(BOOT_UPDATE.CMD.UPDATE_CMD_UPDATA_READY);
-
+                Display_label("擦除流程", Color.DarkGray, Color.Green);
+                loaderserial.Writebyte(BOOT_UPDATE.CMD.UPDATE_CMD_COMPEL_READY);
+                delay_time(25);
                 if (loaderserial.get_rc_cnt() > 7)
                 {
-                    if (loaderframe.IsCommandRespondOk(loaderserial, BOOT_UPDATE.CMD.UPDATE_CMD_UPDATA_READY_OK) == 1)
+                    if (loaderframe.IsCommandRespondOk(loaderserial, BOOT_UPDATE.CMD.UPDATE_CMD_COMPEL_READY_OK) == 1)
                     {
-                        Display_label("updata ready ok", Color.DarkGray, Color.Green);
+                        Display_label("擦除成功", Color.DarkGray, Color.Green);
                         break;
                     }
-                    else {
-
-                        Display_label("updata ready"+i.ToString(),Color.DarkGray,Color.Green);
+                    else
+                    {
+                        Display_label("擦除重连", Color.DarkGray, Color.Yellow);
                     }
-
                 }
             }
-
-
-
-            Thread R2 = new Thread(DevDataProg);
+            Display_label("升级中", Color.DarkGray, Color.Green);
+            Thread R2 = new Thread(Iap_Download);
             R2.IsBackground = true;
             R2.Start();
+            
         }
 
         volatile static int Data_Len = 0;
         public UInt16 Seq = 0;
 
 
-        private void DevDataProg()
+        private void Iap_Download()
         {
             UInt16 i, j;
             int len, TxtSeq = 0;
@@ -370,8 +410,6 @@ namespace BOOT_UPDATE
 
                                 }
                             }
-
-
                         }
 
 
@@ -423,7 +461,7 @@ namespace BOOT_UPDATE
                         loaderserial.clear_rev();
                         loaderframe.TxCmd(BOOT_UPDATE.CMD.UPDATE_CMD_FILE_END);
                         loaderserial.Write(loaderframe);
-                        Delay_Ms(200);
+                        delay_time(10);
 
                         if (loaderframe.IsCommandRespondOk(loaderserial, BOOT_UPDATE.CMD.UPDATE_CMD_LOAD_OK) == 1)
                         {
@@ -487,13 +525,14 @@ namespace BOOT_UPDATE
             {
                 if (tx_retry_cnt < 3)
                 {
-                    Delay_Ms(200);
+                
                     Debug.Write("IsFlashWriteSuccess" + Convert.ToString(tx_retry_cnt));
                     loaderserial.clear_rev();
                     loaderframe.TxFlashDataFrame(addr, l_seq, data_arr, DataL);
                     loaderserial.Write(loaderframe);
-                    System.Threading.Thread.Sleep(25);
-                    
+                    System.Threading.Thread.Sleep(50);
+                    delay_time(20);
+
                     if (loaderframe.IsDataRespondOk(loaderserial, BOOT_UPDATE.CMD.UPDATE_CMD_CRC_OK, l_seq) == true)
                     {
                         Seq++;
@@ -552,6 +591,20 @@ namespace BOOT_UPDATE
 
         }
 
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void AboutBtn_Click(object sender, EventArgs e)
+        {
+            About.ShowDialog();
+        }
     }
 }
 
