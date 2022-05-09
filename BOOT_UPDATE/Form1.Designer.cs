@@ -41,8 +41,8 @@ namespace BOOT_UPDATE
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.Voltage_label = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
             this.sComm = new System.IO.Ports.SerialPort(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -53,13 +53,21 @@ namespace BOOT_UPDATE
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.AboutBtn = new System.Windows.Forms.ToolStripButton();
-            this.CommStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.ComStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ReceiveBox = new System.Windows.Forms.TextBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ASCIIBtn = new System.Windows.Forms.RadioButton();
+            this.HEXBtn = new System.Windows.Forms.RadioButton();
+            this.Clear = new System.Windows.Forms.Button();
             tabPage1 = new System.Windows.Forms.TabPage();
             tabPage1.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabPage1
@@ -75,7 +83,7 @@ namespace BOOT_UPDATE
             tabPage1.Location = new System.Drawing.Point(4, 25);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            tabPage1.Size = new System.Drawing.Size(1039, 513);
+            tabPage1.Size = new System.Drawing.Size(1027, 495);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "升级";
             // 
@@ -90,7 +98,7 @@ namespace BOOT_UPDATE
             // UpDate_Btn
             // 
             this.UpDate_Btn.Enabled = false;
-            this.UpDate_Btn.Location = new System.Drawing.Point(809, 166);
+            this.UpDate_Btn.Location = new System.Drawing.Point(809, 159);
             this.UpDate_Btn.Name = "UpDate_Btn";
             this.UpDate_Btn.Size = new System.Drawing.Size(163, 43);
             this.UpDate_Btn.TabIndex = 4;
@@ -131,6 +139,7 @@ namespace BOOT_UPDATE
             this.listbox_hex.Name = "listbox_hex";
             this.listbox_hex.Size = new System.Drawing.Size(731, 319);
             this.listbox_hex.TabIndex = 1;
+            this.listbox_hex.SelectedIndexChanged += new System.EventHandler(this.listbox_hex_SelectedIndexChanged);
             // 
             // tabControl2
             // 
@@ -164,42 +173,47 @@ namespace BOOT_UPDATE
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(1, 46);
+            this.tabControl1.Controls.Add(tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage5);
+            this.tabControl1.Location = new System.Drawing.Point(0, 44);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1047, 542);
+            this.tabControl1.Size = new System.Drawing.Size(1035, 524);
             this.tabControl1.TabIndex = 4;
             // 
             // tabPage2
             // 
             this.tabPage2.BackColor = System.Drawing.Color.DarkGray;
-            this.tabPage2.Controls.Add(this.textBox1);
-            this.tabPage2.Controls.Add(this.Voltage_label);
+            this.tabPage2.Controls.Add(this.Clear);
+            this.tabPage2.Controls.Add(this.groupBox1);
+            this.tabPage2.Controls.Add(this.ReceiveBox);
+            this.tabPage2.Controls.Add(this.label1);
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1029, 496);
+            this.tabPage2.Size = new System.Drawing.Size(1027, 495);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "预留";
+            this.tabPage2.Text = "串口助手";
             // 
-            // textBox1
+            // label1
             // 
-            this.textBox1.Location = new System.Drawing.Point(70, 18);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 25);
-            this.textBox1.TabIndex = 1;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(15, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(67, 15);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "串口数据";
             // 
-            // Voltage_label
+            // tabPage5
             // 
-            this.Voltage_label.AutoSize = true;
-            this.Voltage_label.Location = new System.Drawing.Point(30, 23);
-            this.Voltage_label.Name = "Voltage_label";
-            this.Voltage_label.Size = new System.Drawing.Size(37, 15);
-            this.Voltage_label.TabIndex = 0;
-            this.Voltage_label.Text = "电压";
-            this.Voltage_label.Click += new System.EventHandler(this.label1_Click);
+            this.tabPage5.Location = new System.Drawing.Point(4, 25);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage5.Size = new System.Drawing.Size(1027, 495);
+            this.tabPage5.TabIndex = 2;
+            this.tabPage5.Text = "预留";
+            this.tabPage5.UseVisualStyleBackColor = true;
             // 
             // sComm
             // 
@@ -219,7 +233,7 @@ namespace BOOT_UPDATE
             this.AboutBtn});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1046, 28);
+            this.toolStrip1.Size = new System.Drawing.Size(1035, 28);
             this.toolStrip1.TabIndex = 5;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -241,7 +255,6 @@ namespace BOOT_UPDATE
             // cmPort
             // 
             this.cmPort.BackColor = System.Drawing.SystemColors.MenuBar;
-            this.cmPort.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
             this.cmPort.Name = "cmPort";
             this.cmPort.Size = new System.Drawing.Size(121, 28);
             this.cmPort.Text = "选择串口";
@@ -274,19 +287,84 @@ namespace BOOT_UPDATE
             this.AboutBtn.Text = "关于";
             this.AboutBtn.Click += new System.EventHandler(this.AboutBtn_Click);
             // 
-            // CommStatus
+            // statusStrip1
             // 
-            this.CommStatus.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.CommStatus.Margin = new System.Windows.Forms.Padding(0, 3, 0, 2);
-            this.CommStatus.Name = "CommStatus";
-            this.CommStatus.Size = new System.Drawing.Size(376, 17);
-            this.CommStatus.Text = "打开串口：无";
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ComStatus});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 571);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(1035, 26);
+            this.statusStrip1.TabIndex = 7;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // ComStatus
+            // 
+            this.ComStatus.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.ComStatus.Name = "ComStatus";
+            this.ComStatus.Size = new System.Drawing.Size(69, 20);
+            this.ComStatus.Text = "串口状态";
+            // 
+            // ReceiveBox
+            // 
+            this.ReceiveBox.Location = new System.Drawing.Point(18, 27);
+            this.ReceiveBox.Multiline = true;
+            this.ReceiveBox.Name = "ReceiveBox";
+            this.ReceiveBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.ReceiveBox.Size = new System.Drawing.Size(715, 388);
+            this.ReceiveBox.TabIndex = 2;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.HEXBtn);
+            this.groupBox1.Controls.Add(this.ASCIIBtn);
+            this.groupBox1.Location = new System.Drawing.Point(18, 421);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(187, 53);
+            this.groupBox1.TabIndex = 3;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "接收设置";
+            this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
+            // 
+            // ASCIIBtn
+            // 
+            this.ASCIIBtn.AutoSize = true;
+            this.ASCIIBtn.Checked = true;
+            this.ASCIIBtn.Location = new System.Drawing.Point(15, 24);
+            this.ASCIIBtn.Name = "ASCIIBtn";
+            this.ASCIIBtn.Size = new System.Drawing.Size(68, 19);
+            this.ASCIIBtn.TabIndex = 0;
+            this.ASCIIBtn.TabStop = true;
+            this.ASCIIBtn.Text = "ASCII";
+            this.ASCIIBtn.UseVisualStyleBackColor = true;
+            // 
+            // HEXBtn
+            // 
+            this.HEXBtn.AutoSize = true;
+            this.HEXBtn.Location = new System.Drawing.Point(115, 24);
+            this.HEXBtn.Name = "HEXBtn";
+            this.HEXBtn.Size = new System.Drawing.Size(52, 19);
+            this.HEXBtn.TabIndex = 4;
+            this.HEXBtn.TabStop = true;
+            this.HEXBtn.Text = "HEX";
+            this.HEXBtn.UseVisualStyleBackColor = true;
+            // 
+            // Clear
+            // 
+            this.Clear.Location = new System.Drawing.Point(640, 421);
+            this.Clear.Name = "Clear";
+            this.Clear.Size = new System.Drawing.Size(93, 28);
+            this.Clear.TabIndex = 4;
+            this.Clear.Text = "清除接收区";
+            this.Clear.UseVisualStyleBackColor = true;
+            this.Clear.Click += new System.EventHandler(this.Clear_Click);
             // 
             // CJQ2805
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1046, 588);
+            this.ClientSize = new System.Drawing.Size(1035, 597);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.tabControl1);
             this.IsMdiContainer = true;
@@ -300,6 +378,10 @@ namespace BOOT_UPDATE
             this.tabPage2.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -322,13 +404,19 @@ namespace BOOT_UPDATE
         private System.Windows.Forms.ToolStripComboBox cmPort;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton AboutBtn;
-        private System.Windows.Forms.ToolStripStatusLabel CommStatus;
         private System.Windows.Forms.Label lab_disp_up_state;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ProgressBar progressBar1;
-        public System.Windows.Forms.Label Voltage_label;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel ComStatus;
+        private System.Windows.Forms.TextBox ReceiveBox;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button Clear;
+        private System.Windows.Forms.RadioButton HEXBtn;
+        private System.Windows.Forms.RadioButton ASCIIBtn;
     }
 }
 

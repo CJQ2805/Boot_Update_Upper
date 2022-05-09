@@ -23,15 +23,16 @@ namespace BOOT_UPDATE
         CJQ_2805.CommPack      loaderframe;
         About About = new About();
         //文件创建标志
-        bool readFileFlag = false; 
+        bool readFileFlag = false;
 
-
+        Thread Trd_Usart = null;        //这个是串口助手处理串口数据的线程，在多个线程中开启、挂起、恢复
         public CJQ2805()
         {
             InitializeComponent();
             //System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
         }
 
+        
         private void CJQ2805_Load(object sender, EventArgs e)
         {
             try
@@ -42,13 +43,14 @@ namespace BOOT_UPDATE
             }
             catch
             {
-                CommStatus.Text = "找不到通信端口! ";
+                ComStatus.Text = "找不到通信端口! ";
             }
             loaderserial = new CJQ_2805.SerialManager();
             loaderhex = new CJQ_2805.HexParse();
             loaderframe = new CJQ_2805.CommPack();
-        }
 
+
+        }
 
 
 
@@ -66,18 +68,23 @@ namespace BOOT_UPDATE
                     }
                     loaderserial.Open(cmPort.Text, (int)19200); //安全打开串口
                     cmPort.Enabled = false;
-                    open_com += sComm.PortName.Substring(3, 1) + ",";
+                    open_com += cmPort.Text.Substring(3, 1) + ","; 
                     open_com += "波特率: " + sComm.BaudRate.ToString() + "，";
                     open_com += "数据位: " + sComm.DataBits.ToString() + "，";
                     open_com += "停止位: " + "1" + ", ";
                     open_com += "校验位: " + "无";
 
-                    CommStatus.Text = open_com;
+                    ComStatus.Text = open_com;
 
                     IsUpdata = false;
                     IsUpdata_state = 0;
                     OpenBtn.Text = "关闭串口";
                     ReadFileBtn.Enabled = true;
+
+                    Trd_Usart = new Thread(Usart_handle);
+                    Trd_Usart.IsBackground = true;
+                    Trd_Usart.Start();
+
                 }
                 else {
                     ReadFileBtn.Enabled = false;
@@ -98,20 +105,79 @@ namespace BOOT_UPDATE
                 OpenBtn.Text = "打开串口";
                 loaderserial.Close();
                 Debug.WriteLine("Err: "+Err.Message.ToString());
-                CommStatus.Text = "串口出错！";
+                ComStatus.Text = "串口出错！";
             }
         }
-       
+
+        /// <summary>
+        /// 这个是串口助手窗体的线程，主要用作串口数据的处理
+        /// </summary>
+        public void Usart_handle()
+        {
+            while (true)
+            {
+                byte[] a = new byte[loaderserial.get_rc_cnt()];
+                loaderserial.copy_serial_data(a, a.Length);
+
+                string my2 = Encoding.UTF8.GetString(a);
+                string b = "";
+                if (my2 == "")
+                    continue;
+                if (ASCIIBtn.Checked)
+                {
+                    b = my2;
+                }
+                else {
+                    b = ASCIIToHex(my2);
+
+                }
+
+                Control.CheckForIllegalCrossThreadCalls = false; //禁止捕获对错误线程的调用。
+                setReceiveBox_data(b);
+                loaderserial.clear_rev();
+
+            }
+        
+        }
+        public void setReceiveBox_data(string s)
+        {
+            ReceiveBox.AppendText(s + "\r\n");
+            ReceiveBox.ScrollToCaret();
+        }
+
+        private string ASCIIToHex(string s)
+        {
+            try
+            {
+                byte[] a = Encoding.UTF8.GetBytes(s.Trim());
+                string mystr1 = "";
+                for (int i = 0; i < a.Length; i++)
+                {
+                    mystr1 += a[i].ToString("X2") + " ";
+                }
+                return mystr1;
+            }
+            catch(Exception e) 
+            {
+
+                MessageBox.Show("转化失败！"+e.Message, "错误提示");
+                return s;
+            }
+        
+        
+        }
+
+
+
+
+
+
         private void ReadFileBtn_Click(object sender, EventArgs e)
         {   
             readFileFlag = true;
             loaderhex.set_list_view(listbox_hex, readFileFlag);
             UpDate_Btn.Enabled = true;
         }
-
-
-
-
 
 
         /// <summary>
@@ -168,6 +234,7 @@ namespace BOOT_UPDATE
 
         public void Updata_process()
         {
+            
             byte i = 0;
             //System.Threading.Thread.Sleep(150);
             //for (byte i = 0; i < 3; i++) 
@@ -590,20 +657,25 @@ namespace BOOT_UPDATE
             }
 
         }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void AboutBtn_Click(object sender, EventArgs e)
         {
             About.ShowDialog();
+        }
+
+
+        private void listbox_hex_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Clear_Click(object sender, EventArgs e)
+        {
+            ReceiveBox.Text = "";
         }
     }
 }

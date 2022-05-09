@@ -18,7 +18,7 @@ namespace CJQ_2805
 		private SerialPort m_SerialPort;
 
 
-        byte[] my_CommRevArr = new byte[255];
+        byte[] my_CommRevArr = new byte[1000];
 		byte my_Comm_rev_cnt = 0;
 
 		public byte[] recFrame
@@ -58,6 +58,10 @@ namespace CJQ_2805
 			return my_Comm_rev_cnt;
 		}
 
+		public void copy_serial_data(byte[] a, int length)
+		{
+			Array.Copy(my_CommRevArr, a, length);
+		}
 
 		private void my_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
