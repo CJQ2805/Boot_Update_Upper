@@ -41,6 +41,11 @@ namespace BOOT_UPDATE
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.ReceiveBox = new System.Windows.Forms.RichTextBox();
+            this.Clear = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.HEXBtn = new System.Windows.Forms.RadioButton();
+            this.ASCIIBtn = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.sComm = new System.IO.Ports.SerialPort(this.components);
@@ -55,19 +60,14 @@ namespace BOOT_UPDATE
             this.AboutBtn = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ComStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.ReceiveBox = new System.Windows.Forms.TextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.ASCIIBtn = new System.Windows.Forms.RadioButton();
-            this.HEXBtn = new System.Windows.Forms.RadioButton();
-            this.Clear = new System.Windows.Forms.Button();
             tabPage1 = new System.Windows.Forms.TabPage();
             tabPage1.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabPage1
@@ -185,9 +185,9 @@ namespace BOOT_UPDATE
             // tabPage2
             // 
             this.tabPage2.BackColor = System.Drawing.Color.DarkGray;
+            this.tabPage2.Controls.Add(this.ReceiveBox);
             this.tabPage2.Controls.Add(this.Clear);
             this.tabPage2.Controls.Add(this.groupBox1);
-            this.tabPage2.Controls.Add(this.ReceiveBox);
             this.tabPage2.Controls.Add(this.label1);
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
@@ -195,6 +195,59 @@ namespace BOOT_UPDATE
             this.tabPage2.Size = new System.Drawing.Size(1027, 495);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "串口助手";
+            // 
+            // ReceiveBox
+            // 
+            this.ReceiveBox.Location = new System.Drawing.Point(18, 27);
+            this.ReceiveBox.Name = "ReceiveBox";
+            this.ReceiveBox.Size = new System.Drawing.Size(715, 388);
+            this.ReceiveBox.TabIndex = 5;
+            this.ReceiveBox.Text = "";
+            // 
+            // Clear
+            // 
+            this.Clear.Location = new System.Drawing.Point(640, 421);
+            this.Clear.Name = "Clear";
+            this.Clear.Size = new System.Drawing.Size(93, 28);
+            this.Clear.TabIndex = 4;
+            this.Clear.Text = "清除接收区";
+            this.Clear.UseVisualStyleBackColor = true;
+            this.Clear.Click += new System.EventHandler(this.Clear_Click);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.HEXBtn);
+            this.groupBox1.Controls.Add(this.ASCIIBtn);
+            this.groupBox1.Location = new System.Drawing.Point(18, 421);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(187, 53);
+            this.groupBox1.TabIndex = 3;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "接收设置";
+            this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
+            // 
+            // HEXBtn
+            // 
+            this.HEXBtn.AutoSize = true;
+            this.HEXBtn.Location = new System.Drawing.Point(115, 24);
+            this.HEXBtn.Name = "HEXBtn";
+            this.HEXBtn.Size = new System.Drawing.Size(52, 19);
+            this.HEXBtn.TabIndex = 4;
+            this.HEXBtn.TabStop = true;
+            this.HEXBtn.Text = "HEX";
+            this.HEXBtn.UseVisualStyleBackColor = true;
+            // 
+            // ASCIIBtn
+            // 
+            this.ASCIIBtn.AutoSize = true;
+            this.ASCIIBtn.Checked = true;
+            this.ASCIIBtn.Location = new System.Drawing.Point(15, 24);
+            this.ASCIIBtn.Name = "ASCIIBtn";
+            this.ASCIIBtn.Size = new System.Drawing.Size(68, 19);
+            this.ASCIIBtn.TabIndex = 0;
+            this.ASCIIBtn.TabStop = true;
+            this.ASCIIBtn.Text = "ASCII";
+            this.ASCIIBtn.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -217,7 +270,7 @@ namespace BOOT_UPDATE
             // 
             // sComm
             // 
-            this.sComm.BaudRate = 19200;
+            this.sComm.BaudRate = 115200;
             this.sComm.ParityReplace = ((byte)(0));
             // 
             // toolStrip1
@@ -255,6 +308,7 @@ namespace BOOT_UPDATE
             // cmPort
             // 
             this.cmPort.BackColor = System.Drawing.SystemColors.MenuBar;
+            this.cmPort.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
             this.cmPort.Name = "cmPort";
             this.cmPort.Size = new System.Drawing.Size(121, 28);
             this.cmPort.Text = "选择串口";
@@ -305,60 +359,6 @@ namespace BOOT_UPDATE
             this.ComStatus.Size = new System.Drawing.Size(69, 20);
             this.ComStatus.Text = "串口状态";
             // 
-            // ReceiveBox
-            // 
-            this.ReceiveBox.Location = new System.Drawing.Point(18, 27);
-            this.ReceiveBox.Multiline = true;
-            this.ReceiveBox.Name = "ReceiveBox";
-            this.ReceiveBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.ReceiveBox.Size = new System.Drawing.Size(715, 388);
-            this.ReceiveBox.TabIndex = 2;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.HEXBtn);
-            this.groupBox1.Controls.Add(this.ASCIIBtn);
-            this.groupBox1.Location = new System.Drawing.Point(18, 421);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(187, 53);
-            this.groupBox1.TabIndex = 3;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "接收设置";
-            this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
-            // 
-            // ASCIIBtn
-            // 
-            this.ASCIIBtn.AutoSize = true;
-            this.ASCIIBtn.Checked = true;
-            this.ASCIIBtn.Location = new System.Drawing.Point(15, 24);
-            this.ASCIIBtn.Name = "ASCIIBtn";
-            this.ASCIIBtn.Size = new System.Drawing.Size(68, 19);
-            this.ASCIIBtn.TabIndex = 0;
-            this.ASCIIBtn.TabStop = true;
-            this.ASCIIBtn.Text = "ASCII";
-            this.ASCIIBtn.UseVisualStyleBackColor = true;
-            // 
-            // HEXBtn
-            // 
-            this.HEXBtn.AutoSize = true;
-            this.HEXBtn.Location = new System.Drawing.Point(115, 24);
-            this.HEXBtn.Name = "HEXBtn";
-            this.HEXBtn.Size = new System.Drawing.Size(52, 19);
-            this.HEXBtn.TabIndex = 4;
-            this.HEXBtn.TabStop = true;
-            this.HEXBtn.Text = "HEX";
-            this.HEXBtn.UseVisualStyleBackColor = true;
-            // 
-            // Clear
-            // 
-            this.Clear.Location = new System.Drawing.Point(640, 421);
-            this.Clear.Name = "Clear";
-            this.Clear.Size = new System.Drawing.Size(93, 28);
-            this.Clear.TabIndex = 4;
-            this.Clear.Text = "清除接收区";
-            this.Clear.UseVisualStyleBackColor = true;
-            this.Clear.Click += new System.EventHandler(this.Clear_Click);
-            // 
             // CJQ2805
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -376,12 +376,12 @@ namespace BOOT_UPDATE
             this.tabControl1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -412,11 +412,11 @@ namespace BOOT_UPDATE
         private System.Windows.Forms.TabPage tabPage5;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel ComStatus;
-        private System.Windows.Forms.TextBox ReceiveBox;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button Clear;
         private System.Windows.Forms.RadioButton HEXBtn;
         private System.Windows.Forms.RadioButton ASCIIBtn;
+        private System.Windows.Forms.RichTextBox ReceiveBox;
     }
 }
 

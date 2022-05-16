@@ -66,7 +66,7 @@ namespace BOOT_UPDATE
                         MessageBox.Show("串口不能为空！");
                         return;
                     }
-                    loaderserial.Open(cmPort.Text, (int)19200); //安全打开串口
+                    loaderserial.Open(cmPort.Text, (int)115200); //安全打开串口
                     cmPort.Enabled = false;
                     open_com += cmPort.Text.Substring(3, 1) + ","; 
                     open_com += "波特率: " + sComm.BaudRate.ToString() + "，";
@@ -80,7 +80,11 @@ namespace BOOT_UPDATE
                     IsUpdata_state = 0;
                     OpenBtn.Text = "关闭串口";
                     ReadFileBtn.Enabled = true;
-
+                    /*
+                     * 
+                    这里在打开串口的时候就进入串口助手的模式
+                    如果是升级或者之后预留功能，就将串口助手线程挂起
+                     */
                     Trd_Usart = new Thread(Usart_handle);
                     Trd_Usart.IsBackground = true;
                     Trd_Usart.Start();
@@ -116,35 +120,91 @@ namespace BOOT_UPDATE
         {
             while (true)
             {
-                byte[] a = new byte[loaderserial.get_rc_cnt()];
-                loaderserial.copy_serial_data(a, a.Length);
-
-                string my2 = Encoding.UTF8.GetString(a);
-                string b = "";
-                if (my2 == "")
+                byte[] bytIntactData = new byte[loaderserial.get_rc_cnt()];
+                loaderserial.copy_serial_data(bytIntactData, bytIntactData.Length);
+                string strIntactData = Encoding.UTF8.GetString(bytIntactData);
+                string strColor = "";
+                string strOutData = "";
+                if (strIntactData == "")
                     continue;
+               
+                if (strIntactData.Length > 3)
+                {
+                    strColor = strIntactData.Substring(4, 3);
+                }
+
+
+
+                if (strColor == "31m" ||
+                    strColor == "32m" ||
+                    strColor == "33m" ||
+                    strColor == "34m")
+                {
+                    strOutData = strIntactData.Remove(0, 7);
+                    strOutData = strOutData.Substring(0, strOutData.IndexOf("\u001b"));
+
+                }
+                else
+                {
+                    strOutData = strIntactData;
+                }
+
+
+                string strTransData = "";
                 if (ASCIIBtn.Checked)
                 {
-                    b = my2;
+                    strTransData = strOutData;
                 }
                 else {
-                    b = ASCIIToHex(my2);
+                    strTransData = ASCIIToHex(strOutData);
 
                 }
 
                 Control.CheckForIllegalCrossThreadCalls = false; //禁止捕获对错误线程的调用。
-                setReceiveBox_data(b);
+                setReceiveBox_data(strTransData, strColor);
                 loaderserial.clear_rev();
 
             }
         
         }
-        public void setReceiveBox_data(string s)
+        public void setReceiveBox_data(string strTransData, string strColor)
         {
-            ReceiveBox.AppendText(s + "\r\n");
+            ReceiveBox.SelectionStart = ReceiveBox.TextLength;
+            ReceiveBox.SelectionLength = 0;
+            switch (strColor)
+           {
+                case "31m":
+                    ReceiveBox.SelectionColor = Color.Red;
+                    break;
+
+                case "32m":
+                    ReceiveBox.SelectionColor = Color.Green;
+                    break;
+
+
+                case "33m":
+                    ReceiveBox.SelectionColor = Color.Yellow;
+                    break;
+
+                case "34m":
+                    ReceiveBox.SelectionColor = Color.Blue;
+                    break;
+
+                default:
+                    ReceiveBox.SelectionColor = Color.Black ;
+                    break;
+
+            }
+
+            ReceiveBox.AppendText(strTransData);
             ReceiveBox.ScrollToCaret();
         }
 
+        /// <summary>
+        /// 将ASCII文本内容转化成Hex
+        /// </summary>
+        /// <param name="s"> 输入的字符串 </param>
+        /// <returns>返回字符串</returns>
         private string ASCIIToHex(string s)
         {
             try
@@ -167,9 +227,31 @@ namespace BOOT_UPDATE
         
         }
 
+        /// <summary>
+        /// 将Hex文本内容转化成ASCII
+        /// </summary>
+        /// <param name="s"> 输入的字符串 </param>
+        /// <returns>返回字符串</returns>
+        private string HexToASCII(string str)
+        {
+            try
+            {
+                string[] mystr1 = str.Trim().Split(' ');
+                byte[] t = new byte[mystr1.Length];
+                for (int i = 0; i < t.Length; i++)
+                {
+                    t[i] = Convert.ToByte(mystr1[i], 16);
+                }
+                return Encoding.UTF8.GetString(t);
 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("转换失败！" + ex.Message, "错误提示");
+                return str;
 
-
+            }
+        }
 
 
         private void ReadFileBtn_Click(object sender, EventArgs e)
@@ -232,9 +314,12 @@ namespace BOOT_UPDATE
             R1.Start();
         }
 
+        [Obsolete]
         public void Updata_process()
         {
-            
+            Trd_Usart.Suspend();
+
+
             byte i = 0;
             //System.Threading.Thread.Sleep(150);
             //for (byte i = 0; i < 3; i++) 
@@ -243,7 +328,6 @@ namespace BOOT_UPDATE
             //    loaderserial.Write(loaderframe);
             //}
  
-
             for (i = 0; i <= 5; i++)
             {
                 loaderserial.clear_rev();
@@ -329,7 +413,6 @@ namespace BOOT_UPDATE
 
             }
 
-
             //这里开始是第二次
 
             for (i = 0; i < 3; i++)
@@ -366,8 +449,8 @@ namespace BOOT_UPDATE
                         Display_label("升级就绪 OK", Color.DarkGray, Color.Green);
                         break;
                     }
-                    else {
-
+                    else
+                    {
                         Display_label("升级重连"+i.ToString(),Color.DarkGray,Color.Green);
                     }
 
@@ -403,7 +486,7 @@ namespace BOOT_UPDATE
         volatile static int Data_Len = 0;
         public UInt16 Seq = 0;
 
-
+        [Obsolete]
         private void Iap_Download()
         {
             UInt16 i, j;
@@ -545,11 +628,12 @@ namespace BOOT_UPDATE
                         IsUpdata = true;
 
                         Display_label("升级完成", Color.Green, Color.Black);
+                        Trd_Usart.Resume(); //恢复串口助手线程
                         return;
                     }
-                }
-               
+                }     
             }
+            Trd_Usart.Resume(); //恢复串口助手线程
             return;
 
         }
@@ -620,7 +704,6 @@ namespace BOOT_UPDATE
                 {
                     return false;
                 }
-
             }
         }
 
@@ -635,8 +718,7 @@ namespace BOOT_UPDATE
             {
                 progressBar1.Value = value;
                 
-            }));
-        
+            }));   
         }
 
         private void Display_label(string test_str, Color back_color,Color fore_color)
@@ -655,7 +737,6 @@ namespace BOOT_UPDATE
             {
                 loaderserial.SearchAndAddSerialToComboBox(cmPort);
             }
-
         }
         private void AboutBtn_Click(object sender, EventArgs e)
         {
@@ -673,6 +754,9 @@ namespace BOOT_UPDATE
 
         }
 
+        /// <summary>
+        /// 清空ReceiveBox的文本内容
+        /// </summary>
         private void Clear_Click(object sender, EventArgs e)
         {
             ReceiveBox.Text = "";
